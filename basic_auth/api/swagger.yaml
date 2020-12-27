@@ -1,0 +1,95 @@
+openapi: 3.0.0
+info:
+  title: myapi
+  description: HTTP server in GO with swagger codegen
+  license:
+    name: MIT
+  version: 1.0.0
+servers:
+- url: http://localhost/v1
+security:
+- basicAuth: []
+paths:
+  /healthz:
+    get:
+      summary: Node Health
+      operationId: checkHealth
+      responses:
+        "200":
+          description: OK message
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        "401":
+          description: Authentication information is missing or invalid
+          headers:
+            WWW_Authenticate:
+              style: simple
+              explode: false
+              schema:
+                type: string
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnexpectedError'
+      security:
+      - basicAuth: []
+  /hello/{user}:
+    get:
+      summary: Returns a greeting to the user!
+      operationId: helloUser
+      parameters:
+      - name: user
+        in: path
+        description: The name of the user to greet.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Returns the greeting.
+          content:
+            text/plain:
+              schema:
+                type: string
+                x-content-type: text/plain
+        "401":
+          description: Authentication information is missing or invalid
+          headers:
+            WWW_Authenticate:
+              style: simple
+              explode: false
+              schema:
+                type: string
+        "400":
+          description: Invalid characters in "user" were provided.
+      security:
+      - basicAuth: []
+components:
+  schemas:
+    UnexpectedError:
+      type: object
+      properties:
+        code:
+          type: integer
+        message:
+          type: string
+  responses:
+    UnauthorizedError:
+      description: Authentication information is missing or invalid
+      headers:
+        WWW_Authenticate:
+          style: simple
+          explode: false
+          schema:
+            type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic

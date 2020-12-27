@@ -1,0 +1,14 @@
+
+	Route{
+		"AddPet",
+		strings.ToUpper("Post"),
+		"/v2/pet",
+		AddMyPet,
+	},
+
+	Route{
+		"DeletePet",
+		strings.ToUpper("Delete"),
+		"/v2/pet/{petId}",
+		DeleteMyPet,
+	},

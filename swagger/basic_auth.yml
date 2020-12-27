@@ -1,0 +1,93 @@
+openapi: 3.0.0
+info:
+  description: HTTP server in GO with swagger codegen
+  version: 1.0.0
+  title: myapi
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost/v1
+
+schemes:
+  - "https"
+  - "http"
+
+components:
+   securitySchemes:
+     basicAuth:      # <-- arbitrary name for the security scheme
+        type: http
+        scheme: basic
+
+   responses:
+     UnauthorizedError:
+        description: Authentication information is missing or invalid
+        headers:
+          WWW_Authenticate:
+            schema:
+              type: string
+
+  #-------------------------------
+  # Reusable schemas (data models)
+  #-------------------------------
+   schemas:
+     UnexpectedError:            # Can be referenced as '#/components/schemas/UnexpectedError'
+       type: object
+       properties:
+         code:
+           type: integer
+         message:
+           type: string
+
+ # <-- security section applies basic authentications to the entire API
+security:
+   - basicAuth:  []   # <-- use the same name here 
+
+paths:
+  /healthz:
+    get:
+      summary: Node Health 
+      operationId: checkHealth
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: OK message
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        default:
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnexpectedError"
+            
+  /hello/{user}:
+    get:
+      summary: Returns a greeting to the user!
+      operationId: helloUser
+      security:
+        - basicAuth: []
+      parameters:
+        - name: user
+          in: path
+          type: string
+          required: true
+          description: The name of the user to greet.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Returns the greeting.
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          description: Invalid characters in "user" were provided.
