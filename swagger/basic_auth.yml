@@ -9,6 +9,9 @@ info:
 servers:
   - url: http://localhost/v1
 
+produces:
+  - application/json
+
 schemes:
   - "https"
   - "http"
